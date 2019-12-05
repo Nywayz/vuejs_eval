@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<html class="accueil" lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Evaluation Vuejs</title>
+    <style>
+      * {
+        margin: 0;
+        padding: auto 10%;
+        text-align: center;
+        color: #35495e;
+      }
+
+      input{
+        height: 100%;
+      }
+
+      th{
+        width: 14%;
+      }
+    </style>
+  </head>
+  <body>
+  <div id="app">
+      <h1> {{titre}}</h1>
+
+      <!-- <div v-for="i in tableau.length" :key="i">
+        <input type="text" v-model="tableau[i-1]"></input>
+      </div> -->
+
+
+    <table style="width: 80%; margin: auto 10%;">
+      <caption style="text-align: right;">{{date}}</caption>
+      <tr><th>Id</th><th>Designation</th><th>Qte</th><th>Pu Ht</th><th>Tva</th><th>P Ht</th><th>P Ttc</th><th></th></tr>
+  		<tr v-if="tableau[0] != null" v-for="(item,i) in tableau">
+        <td>
+          <div> {{i + 1}}</div>
+        </td>
+        <td>
+          <input type="text" v-model="tableau[i][1]">
+        </td>
+        <td>
+          <input type="number" v-model="tableau[i][2]">
+        </td>
+        <td>
+          <input type="text" v-model="tableau[i][3]">
+        </td>
+        <td>
+          <input type="number" v-model="tableau[i][4]">
+        </td>
+        <td>
+            <div> {{tableau[i][5] = tableau[i][2] * tableau[i][3]}} €</div>
+        </td>
+        <td>
+            <div> {{tableau[i][6] = tableau[i][5] +((tableau[i][4] /100) * tableau[i][5])}} €</div>
+        </td>
+        <td>
+            <input type="button" value="X" v-on:click="supprimer(i)">
+        </td>
+
+      </tr>
+      <tr>
+        <td colspan="5">
+          <input type="button" style="color: #76967e; border: solid #76967e 0.5px;" v-on:click="ajouter(tableau.length)" value="+ Ajouter une ligne">
+        </td>
+        <td colspan="3">
+          <div style="background-color: lightgrey; font-weight: bold;">Total HT : {{HT}}</div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="5">
+        </td>
+        <td colspan="3">
+          <div style="background-color: lightgrey; font-weight: bold;">Total TTC : {{TTC}}</div>
+        </td>
+      </tr>
+    
+  	</table>
+
+
+
+			<div style="width: 100%; background-color: #f8d7da; color: #862c51;">{{tableau}}</div>
+
+
+  </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script type="text/javascript">
+
+    new Vue({
+      el: '#app',
+      data: function(){
+        return {
+          titre: 'Evaluation Vuejs',
+          tableau: [],
+          date: 'Facture du 1 Décembre 2020'
+        }
+      },
+      methods: {
+        ajouter(max){
+						this.tableau.push([max+1,"",1,0,0,0,0]);
+				},
+        supprimer(i){
+          this.tableau.splice(i,1);
+        },
+        store(){
+          localStorage.setItem('tablePrix', JSON.stringify(this.tableau));
+        }
+      },
+      computed: {
+        HT(){
+          let HT = 0;
+          for(i = 0; i < this.tableau.length; i++){
+              HT += this.tableau[i][5];
+              this.tableau[i][0] = i + 1;
+            }          
+          return HT; 
+        },
+        TTC(){
+          let TTC = 0;
+          for(i = 0; i < this.tableau.length; i++){
+              TTC += this.tableau[i][6];
+              this.tableau[i][0] = i + 1;
+            }          
+          return TTC; 
+        }
+      },
+      watch: {
+        tableau: {
+          handler(){
+            this.HT = 0;
+            this.TTC = 0;
+            for(i = 0; i < this.tableau.length; i++){
+              this.tableau[i][0] = i + 1;
+              this.store();
+            }
+          },
+        }
+      },
+      mounted(){
+        let check = JSON.parse(localStorage.getItem('tablePrix'));
+        console.log(check);
+        if (check) {
+          this.tableau = check;
+        } else {
+        }
+        
+      }
+    })
+    </script>
